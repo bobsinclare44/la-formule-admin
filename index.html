@@ -1,1 +1,357 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Admin La Formule">
+<meta name="theme-color" content="#070a12">
+<title>Admin La Formule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Concept : panneau mobile sombre, un seul accent cyan, magenta réservé au statut VIP */
+:root {
+  --bg: #070a12;
+  --surface: #0e1320;
+  --surface-2: #151c2e;
+  --line: #1f2a42;
+  --fg: #e8eef9;
+  --muted: #8a97b3;
+  --cyan: #00f0ff;
+  --magenta: #ff2bd6;
+  --ok: #3ddc97;
+  --bad: #ff5d6c;
+  --font-display: "Orbitron", "Arial Black", sans-serif;
+  --font-body: "Exo 2", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-text-size-adjust: 100%;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 40% at 50% 0%, rgba(255,43,214,.14), transparent 70%),
+              radial-gradient(70% 40% at 50% 100%, rgba(0,240,255,.10), transparent 70%);
+}
+.wrap { max-width: 640px; margin: 0 auto; padding-block: 20px 40px; }
+h1, h2 { font-family: var(--font-display); text-transform: uppercase; margin: 0; text-wrap: balance; }
+h1 { font-size: 1.35rem; font-weight: 800; color: var(--cyan); text-shadow: 0 0 14px rgba(0,240,255,.55); letter-spacing: .04em; }
+h2 { font-size: 1rem; letter-spacing: .06em; }
+.sub { color: var(--muted); margin: 4px 0 0; font-size: .9rem; }
+.hidden { display: none !important; }
+
+/* Formulaires */
+label { display: block; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+input[type=text], input[type=password], input[type=number], input[type=url], textarea {
+  width: 100%; background: var(--surface); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px;
+  font: inherit; font-size: 16px;
+}
+textarea { min-height: 84px; resize: vertical; }
+input:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--cyan); outline-offset: 2px;
+}
+.field { margin-bottom: 14px; }
+.row { display: flex; gap: 12px; }
+.row > .field { flex: 1; min-width: 0; }
+
+/* Boutons */
+button { font: inherit; cursor: pointer; border: 0; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 20px; border-radius: 12px;
+  font-family: var(--font-display); font-weight: 800; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase;
+}
+.btn-primary { background: var(--cyan); color: #00161a; box-shadow: 0 0 22px rgba(0,240,255,.35); width: 100%; }
+.btn-primary:disabled { opacity: .55; box-shadow: none; }
+.btn-ghost { background: var(--surface-2); color: var(--fg); border: 1px solid var(--line); }
+.btn-small { min-height: 40px; padding: 0 14px; font-size: .72rem; }
+
+/* Connexion */
+#login { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+
+/* Barre du haut */
+.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.top-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* Liste produits */
+.list { display: flex; flex-direction: column; gap: 10px; }
+.item {
+  display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px;
+  text-align: left; width: 100%; color: inherit;
+}
+.item.off { opacity: .55; }
+.thumb {
+  width: 64px; height: 64px; border-radius: 10px; background: var(--surface-2);
+  display: grid; place-items: center; overflow: hidden; color: var(--muted); font-size: .7rem;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.item-main { min-width: 0; }
+.item-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prices { font-variant-numeric: tabular-nums; color: var(--cyan); font-weight: 600; }
+.prices .vip { color: var(--magenta); margin-left: 8px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.tag { font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.tag.vip { color: var(--magenta); border-color: rgba(255,43,214,.5); }
+.empty { text-align: center; color: var(--muted); padding: 40px 12px; border: 1px dashed var(--line); border-radius: 14px; }
+
+/* Feuille d'édition */
+.sheet-back { position: fixed; inset: 0; background: rgba(2,4,9,.72); z-index: 20; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-height: 92%;
+  overflow-y: auto; background: var(--bg); border-top: 1px solid var(--cyan);
+  border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,240,255,.15);
+  padding: 18px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.sheet-in { max-width: 640px; margin: 0 auto; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; }
+.switch-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+}
+.switch-row span { font-size: .95rem; }
+.switch-row small { display: block; color: var(--muted); font-size: .78rem; }
+.switch { position: relative; width: 52px; height: 30px; flex-shrink: 0; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; }
+.switch i { position: absolute; inset: 0; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; transition: .15s; }
+.switch i::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--muted); transition: .15s; }
+.switch input:checked + i { background: rgba(0,240,255,.2); border-color: var(--cyan); }
+.switch input:checked + i::after { transform: translateX(22px); background: var(--cyan); }
+.switch input:focus-visible + i { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+.msg { min-height: 1.3em; margin: 10px 0 0; font-size: .9rem; }
+.msg.err { color: var(--bad); }
+.msg.ok { color: var(--ok); }
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 40; background: var(--surface-2); border: 1px solid var(--ok); color: var(--fg);
+  padding: 10px 16px; border-radius: 999px; font-size: .9rem;
+}
+@media (prefers-reduced-motion: reduce) { .switch i, .switch i::after { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Écran de connexion -->
+  <section id="login">
+    <div>
+      <h1>La Formule</h1>
+      <p class="sub">Panneau admin. Entre ton mot de passe admin.</p>
+    </div>
+    <form id="loginForm" autocomplete="off">
+      <div class="field">
+        <label for="pwd">Mot de passe admin</label>
+        <input id="pwd" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary" id="loginBtn" type="submit">Entrer</button>
+      <p class="msg" id="loginMsg" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- Liste des produits -->
+  <section id="app" class="hidden">
+    <div class="top">
+      <div>
+        <h1>Produits</h1>
+        <p class="sub" id="count"></p>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-ghost btn-small" id="logout" type="button">Quitter</button>
+        <button class="btn btn-primary btn-small" id="newBtn" type="button" style="width:auto">+ Nouveau</button>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+</div>
+
+<!-- Feuille d'édition -->
+<div class="sheet-back hidden" id="back"></div>
+<div class="sheet hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-in">
+    <div class="sheet-head">
+      <h2 id="sheetTitle">Produit</h2>
+      <button class="btn btn-ghost btn-small" id="closeSheet" type="button">Fermer</button>
+    </div>
+    <form id="form" autocomplete="off">
+      <input type="hidden" id="f_id">
+      <div class="field"><label for="f_nom">Nom</label><input id="f_nom" type="text" required></div>
+      <div class="field"><label for="f_desc">Description</label><textarea id="f_desc"></textarea></div>
+      <div class="row">
+        <div class="field"><label for="f_prix">Prix (€)</label><input id="f_prix" type="text" inputmode="decimal" placeholder="22.00" required></div>
+        <div class="field"><label for="f_vip">Prix VIP (€)</label><input id="f_vip" type="text" inputmode="decimal" placeholder="vide = même prix"></div>
+      </div>
+      <div class="field"><label for="f_photo">Lien de la photo</label><input id="f_photo" type="url" placeholder="https://..."></div>
+      <div class="field"><label for="f_video">Lien de la vidéo</label><input id="f_video" type="url" placeholder="https://..."></div>
+      <div class="field"><label for="f_ordre">Ordre d'affichage</label><input id="f_ordre" type="number" inputmode="numeric" value="0"></div>
+      <div class="switch-row">
+        <span>Visible sur le site<small>Désactivé = masqué, sans suppression</small></span>
+        <label class="switch"><input type="checkbox" id="f_visible" checked><i></i></label>
+      </div>
+      <div class="switch-row">
+        <span>Réservé aux VIP<small>Invisible sans clé VIP</small></span>
+        <label class="switch"><input type="checkbox" id="f_reserve"><i></i></label>
+      </div>
+      <button class="btn btn-primary" id="saveBtn" type="submit" style="margin-top:8px">Enregistrer</button>
+      <p class="msg" id="formMsg" role="alert"></p>
+    </form>
+  </div>
+</div>
+<div class="toast hidden" id="toast" role="status"></div>
+
+<script>
+const SB_URL = "https://xwctaegjcknthjwyyolq.supabase.co";
+const SB_KEY = "sb_publishable_8orKy9SLqBdGRkvbAhfQeA_xVKujcDl"; // clé publique, sans danger
+let adminPwd = "";          // gardé en mémoire uniquement
+let products = [];
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const euro = (n) => Number(n).toFixed(2).replace(".", ",") + " €";
+
+// Appel d'une fonction serveur Supabase
+async function rpc(name, args) {
+  let res;
+  try {
+    res = await fetch(SB_URL + "/rest/v1/rpc/" + name, {
+      method: "POST",
+      headers: { "apikey": SB_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify(args)
+    });
+  } catch (e) {
+    throw new Error("Connexion impossible. Vérifie ton réseau.");
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+  if (!res.ok) {
+    const m = (data && data.message) || "";
+    if (m.includes("acces refuse")) throw new Error("Mot de passe incorrect.");
+    throw new Error(m || "Erreur serveur (" + res.status + ").");
+  }
+  return data;
+}
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.remove("hidden");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.add("hidden"), 2200);
+}
+
+async function loadProducts() {
+  products = await rpc("admin_lister_produits", { p_admin: adminPwd }) || [];
+  render();
+}
+
+function render() {
+  $("count").textContent = products.length + (products.length > 1 ? " produits" : " produit");
+  const list = $("list");
+  if (!products.length) {
+    list.innerHTML = '<div class="empty">Aucun produit pour l\'instant.<br>Touche « + Nouveau » pour ajouter le premier.</div>';
+    return;
+  }
+  list.innerHTML = products.map((p) => {
+    const img = p.photo_url ? '<img src="' + esc(p.photo_url) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : "photo";
+    const vip = p.prix_vip != null ? '<span class="vip">VIP ' + euro(p.prix_vip) + '</span>' : "";
+    const tags = (p.visible ? "" : '<span class="tag">Masqué</span>') + (p.reserve_vip ? '<span class="tag vip">Réservé VIP</span>' : "");
+    return '<button class="item' + (p.visible ? "" : " off") + '" type="button" data-id="' + esc(p.id) + '">' +
+      '<div class="thumb">' + img + '</div>' +
+      '<div class="item-main"><div class="item-name">' + esc(p.nom) + '</div>' +
+      '<div class="prices">' + euro(p.prix) + vip + '</div>' +
+      (tags ? '<div class="tags">' + tags + '</div>' : "") + '</div></button>';
+  }).join("");
+}
+
+// Feuille d'édition
+function openSheet(p) {
+  $("sheetTitle").textContent = p ? "Modifier" : "Nouveau produit";
+  $("f_id").value = p ? p.id : "";
+  $("f_nom").value = p ? p.nom : "";
+  $("f_desc").value = p ? (p.description || "") : "";
+  $("f_prix").value = p ? p.prix : "";
+  $("f_vip").value = p && p.prix_vip != null ? p.prix_vip : "";
+  $("f_photo").value = p ? (p.photo_url || "") : "";
+  $("f_video").value = p ? (p.video_url || "") : "";
+  $("f_ordre").value = p ? p.ordre : (products.length ? Math.max(...products.map((x) => x.ordre)) + 1 : 0);
+  $("f_visible").checked = p ? p.visible : true;
+  $("f_reserve").checked = p ? p.reserve_vip : false;
+  $("formMsg").textContent = ""; $("formMsg").className = "msg";
+  $("back").classList.remove("hidden"); $("sheet").classList.remove("hidden");
+  $("sheet").scrollTop = 0;
+}
+function closeSheet() { $("back").classList.add("hidden"); $("sheet").classList.add("hidden"); }
+
+const num = (v) => { const s = String(v).trim().replace(",", "."); return s === "" ? null : Number(s); };
+
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = $("formMsg"), btn = $("saveBtn");
+  const prix = num($("f_prix").value), vip = num($("f_vip").value);
+  if (prix === null || !isFinite(prix) || prix < 0) { msg.className = "msg err"; msg.textContent = "Le prix est invalide."; return; }
+  if (vip !== null && (!isFinite(vip) || vip < 0)) { msg.className = "msg err"; msg.textContent = "Le prix VIP est invalide."; return; }
+  btn.disabled = true; msg.className = "msg"; msg.textContent = "Enregistrement...";
+  try {
+    await rpc("admin_sauver_produit", { p_admin: adminPwd, p: {
+      id: $("f_id").value,
+      nom: $("f_nom").value.trim(),
+      description: $("f_desc").value.trim(),
+      photo_url: $("f_photo").value.trim(),
+      video_url: $("f_video").value.trim(),
+      prix: prix,
+      prix_vip: vip === null ? "" : vip,
+      reserve_vip: $("f_reserve").checked,
+      visible: $("f_visible").checked,
+      ordre: parseInt($("f_ordre").value, 10) || 0
+    }});
+    await loadProducts();
+    closeSheet(); toast("Enregistré");
+  } catch (err) {
+    msg.className = "msg err"; msg.textContent = err.message;
+  } finally { btn.disabled = false; }
+});
+
+$("list").addEventListener("click", (e) => {
+  const b = e.target.closest(".item"); if (!b) return;
+  openSheet(products.find((p) => p.id === b.dataset.id));
+});
+$("newBtn").addEventListener("click", () => openSheet(null));
+$("closeSheet").addEventListener("click", closeSheet);
+$("back").addEventListener("click", closeSheet);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+
+// Connexion
+$("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = $("loginBtn"), msg = $("loginMsg");
+  btn.disabled = true; msg.className = "msg"; msg.textContent = "Vérification...";
+  adminPwd = $("pwd").value;
+  try {
+    await loadProducts();
+    $("login").classList.add("hidden"); $("app").classList.remove("hidden");
+    msg.textContent = "";
+  } catch (err) {
+    adminPwd = ""; msg.className = "msg err"; msg.textContent = err.message;
+  } finally { btn.disabled = false; }
+});
+$("logout").addEventListener("click", () => {
+  adminPwd = ""; products = []; $("pwd").value = "";
+  $("app").classList.add("hidden"); $("login").classList.remove("hidden");
+});
+</script>
+</body>
+</html>
 
